@@ -1,4 +1,4 @@
-import react from "react";
+import React from "react";
 import { Typography, List, ListItem, ListItemText } from "@mui/material";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 const Review = ({ cart }) => {

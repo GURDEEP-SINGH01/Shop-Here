@@ -56,7 +56,7 @@ const Checkout = ({ cart, handleEmptyCart }) => {
         <br />
         <Button
           component={Link}
-          to="/"
+          to="/products"
           variant="outlined"
           type="button"
           onClick={() => handleEmptyCart()}

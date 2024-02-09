@@ -7,11 +7,13 @@ import { ThemeProvider, createTheme } from "@mui/material";
 import Cart from "./components/Cart/Cart";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Checkout from "./components/CheckoutForm/Checkout/Checkout";
-
+import Login from "./components/Home/login";
 const theme = createTheme();
 const App = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
+  const [users, setUsers] = useState([]);
+
   const fetchProducts = async () => {
     const productList = await axios.get("http://localhost:4000/allProducts");
     setProducts(productList.data);
@@ -46,9 +48,15 @@ const App = () => {
     const emptycart = await axios.delete("http://localhost:4000/emptyCart");
     fetchCart();
   };
+  const getUsers = async () => {
+    const users = await axios.get("http://localhost:4000/Users");
+    console.log(users.data);
+    setUsers(users.data);
+  };
   useEffect(() => {
     fetchProducts();
     fetchCart();
+    getUsers();
   }, []);
   // setInterval(()=>{window.location.reload()},60000);
   console.log(cart);
@@ -64,6 +72,12 @@ const App = () => {
           <Route
             exact
             path="/"
+            element={<Login users={users}  />}
+          ></Route>
+
+          <Route
+            exact
+            path="/products"
             element={
               <Products products={products} onAddToCart={handleAddtoCart} />
             }

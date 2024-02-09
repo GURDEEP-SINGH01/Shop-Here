@@ -13,6 +13,8 @@ const PaymentForm = ({ cart, backStep, next, handleEmptyCart }) => {
     // handleEmptyCart();
     next();
   };
+  console.log("PaymentForm");
+
   return (
     <>
       <Review cart={cart} />
@@ -31,7 +33,7 @@ const PaymentForm = ({ cart, backStep, next, handleEmptyCart }) => {
         <Button onClick={backStep} variant="outlined">
           Back
         </Button>
-        <Button variant="contained" color="primary" onClick={handleOnClick()}>
+        <Button variant="contained" color="primary" onClick={handleOnClick}>
           Pay
           <CurrencyRupeeIcon sx={{ height: "1rem" }} />
           {subtotal}

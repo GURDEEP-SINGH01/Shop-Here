@@ -22,7 +22,7 @@ const Navbar = ({ totalItems }) => {
         <Toolbar>
           <Typography
             component={Link}
-            to="/"
+            to="/products"
             className={classes.title}
             variant="h6"
             color="inherit"
@@ -31,7 +31,7 @@ const Navbar = ({ totalItems }) => {
             E-Store
           </Typography>
           <div className={classes.grow} />
-          {location.pathname == "/" && (
+          {location.pathname == "/products" && (
             <div className={classes.button}>
               <IconButton
                 component={Link}

@@ -1,8 +1,9 @@
-import react from "react";
+import react, { useEffect } from "react";
 import { Container, Typography, Button, Grid } from "@mui/material";
 import useStyles from "./styles";
 import CartItem from "./CartItem/CartItem";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 const Cart = ({
   cart,
   handleUpdateCart,
@@ -10,13 +11,40 @@ const Cart = ({
   handleEmptyCart,
 }) => {
   const classes = useStyles();
+  const navigate = useNavigate();
   //   if (!cart.length) return "Loading...";
+  useEffect(() => {
+    // axios
+    //   .get("http://localhost:4000/currentUser")
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     console.log(typeof response.data);
 
+    //     if (response.data === "Welcome, Gurdeep123!") {
+    //       console.log("here");
+    //       navigate("/cart");
+    //     } else {
+    //       console.log("Go to login");
+    //       // navigate("/");
+    //     }
+    //   })
+    //   .catch((e) => {
+    //     console.log(e);
+    //   });
+    const ck = document.cookie.split("=");
+    console.log(ck[0]);
+    if (ck[0] === "LoggedUser") {
+      navigate("/cart");
+    } else {
+      console.log("no user cookie");
+      navigate("/");
+    }
+  }, []);
   const EmptyCart = () => {
     return (
       <Typography variant="h5">
         You have no item in the shopping cart,
-        <Link to="/" className={classes.link}>
+        <Link to="/products" className={classes.link}>
           start adding items to you cart
         </Link>
       </Typography>

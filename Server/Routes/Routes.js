@@ -9,5 +9,10 @@ routes.get("/getfromcart", getdata.getfromCart);
 routes.put("/updatefromcart/:id/:quantity", getdata.updatefromCart);
 routes.delete("/updatefromcart/:id", getdata.deletefromCart);
 routes.delete("/emptyCart", getdata.emptyCart);
-routes.get("/getCountries", (req,res)=>res.send(getcountry.countriesWithMajorStates));
+routes.get("/getCountries", (req, res) =>
+  res.send(getcountry.countriesWithMajorStates)
+);
+routes.get("/Users", getdata.Users);
+routes.post("/User", getdata.UserCookie);
+routes.get("/currentUser", getdata.currentUser);
 module.exports = routes;
