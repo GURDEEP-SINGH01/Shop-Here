@@ -15,4 +15,5 @@ routes.get("/getCountries", (req, res) =>
 routes.get("/Users", getdata.Users);
 routes.post("/User", getdata.UserCookie);
 routes.get("/currentUser", getdata.currentUser);
+routes.get("/logoutcurrentUser", getdata.logout);
 module.exports = routes;

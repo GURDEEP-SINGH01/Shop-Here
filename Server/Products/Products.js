@@ -169,6 +169,10 @@ const currentUser = async (req, res) => {
     res.send("Please log in.");
   }
 };
+const logout = (req, res) => {
+  res.clearCookie("LoggedUser");
+  res.send("Logged out successfully");
+};
 module.exports = {
   allproducts,
   addproducts,
@@ -180,4 +184,5 @@ module.exports = {
   Users,
   UserCookie,
   currentUser,
+  logout,
 };
