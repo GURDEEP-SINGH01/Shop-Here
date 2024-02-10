@@ -56,7 +56,9 @@ const Navbar = ({ totalItems }) => {
             E-Store
           </Typography>
           <div className={classes.grow} />
-          {location.pathname == "/products" && (
+          {(location.pathname === "/products" ||
+            location.pathname === "/cart" ||
+            location.pathname === "/checkout") && (
             <div className={classes.button}>
               <IconButton
                 component={Link}
@@ -64,9 +66,11 @@ const Navbar = ({ totalItems }) => {
                 aria-label="Show cart item"
                 color="inherit"
               >
-                <Badge badgeContent={totalItems} color="secondary">
-                  <ShoppingCart></ShoppingCart>
-                </Badge>
+                {location.pathname === "/products" && (
+                  <Badge badgeContent={totalItems} color="secondary">
+                    <ShoppingCart></ShoppingCart>
+                  </Badge>
+                )}
               </IconButton>
               <ThemeProvider theme={theme}>
                 <Button
