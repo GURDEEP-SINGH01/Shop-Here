@@ -1,22 +1,23 @@
-import react, { useState } from "react";
+import React, { useState } from "react";
 import {
   Paper,
   Stepper,
   Step,
   StepLabel,
   Typography,
-  CircularProgress,
-  Divider,
   Button,
   CssBaseline,
 } from "@mui/material";
 import useStyles from "./styles";
 import AddressForm from "../AddressForm";
 import PaymentForm from "../PaymentForm";
-import { Link } from "react-router-dom";
+import { Link, defer, useLoaderData } from "react-router-dom";
+import axios from "axios";
+import { getCartRoute, getEmptyCartRoute } from "../../../utils/APIRoutes";
 const steps = ["Shipping address", "Payment details"];
 
-const Checkout = ({ cart, handleEmptyCart }) => {
+const Checkout = () => {
+  const { cart, handleEmptyCart } = useLoaderData();  
   const [activeStep, setActiveStep] = useState(0);
   const classes = useStyles();
 
@@ -79,7 +80,7 @@ const Checkout = ({ cart, handleEmptyCart }) => {
     );
   return (
     <>
-      <CssBaseline/>
+      <CssBaseline />
       <div className={classes.toolbar} />
       <main className={classes.layout}>
         <Paper>
@@ -100,3 +101,17 @@ const Checkout = ({ cart, handleEmptyCart }) => {
   );
 };
 export default Checkout;
+
+export const CheckoutLoader = async () => {
+  const cartList = await axios.get(getCartRoute);
+  console.log(cartList.data);
+
+  const handleEmptyCart = async () => {
+    await axios.delete(getEmptyCartRoute);
+  };
+
+  return defer({
+    cart: cartList.data,
+    handleEmptyCart,
+  });
+};

@@ -1,21 +1,17 @@
-import react from "react";
 import {
   AppBar,
   Toolbar,
   IconButton,
   Badge,
-  MenuItem,
-  Menu,
   Typography,
   Button,
   createTheme,
   ThemeProvider,
 } from "@mui/material";
-import { AddShoppingCart, ShoppingCart } from "@mui/icons-material";
+import { ShoppingCart } from "@mui/icons-material";
 import logo from "../../assets/commerce.png";
 import makeStyles from "./styles";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 const theme = createTheme({
   palette: {
@@ -29,7 +25,7 @@ const theme = createTheme({
     },
   },
 });
-const Navbar = ({ totalItems }) => {
+const Navbar = () => {
   const classes = makeStyles();
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,6 +37,7 @@ const Navbar = ({ totalItems }) => {
       navigate("/");
     }
   };
+
   return (
     <>
       <AppBar position="fixed" className={classes.appBar}>
@@ -52,7 +49,7 @@ const Navbar = ({ totalItems }) => {
             variant="h6"
             color="inherit"
           >
-            <img src={logo} height="25px" className={classes.image} />
+            <img src={logo} alt="logo" height="25px" className={classes.image} />
             E-Store
           </Typography>
           <div className={classes.grow} />
@@ -67,7 +64,7 @@ const Navbar = ({ totalItems }) => {
                 color="inherit"
               >
                 {location.pathname === "/products" && (
-                  <Badge badgeContent={totalItems} color="secondary">
+                  <Badge badgeContent={0} color="secondary">
                     <ShoppingCart></ShoppingCart>
                   </Badge>
                 )}
@@ -86,6 +83,7 @@ const Navbar = ({ totalItems }) => {
           )}
         </Toolbar>
       </AppBar>
+      <Outlet />
     </>
   );
 };

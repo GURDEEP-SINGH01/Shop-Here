@@ -1,50 +1,47 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-function Login({ users }) {
+import { getAllUsersRoute, getUserRoute } from "../../utils/APIRoutes";
+
+const Login = () => {
   const [login, setLogin] = useState({ name: "", password: "" });
+  const [users, setUsers] = useState([]);
+
+  const getAllUsers = async () => {
+    const users = await axios.get(getAllUsersRoute);
+    setUsers(users.data);
+  };
+
+  useEffect(() => {
+    const helper = async () => {
+      await getAllUsers();
+    };
+    helper();
+  }, []);
+
   const navigate = useNavigate();
-  let userarr = [...users];
-  
+
   const handlesumbit = async (e) => {
     e.preventDefault();
-    userarr.forEach(async (user) => {
-      if (user.name === login.name && user.password === login.password) {
-        await axios
-          .post("http://localhost:4000/User", login)
-          .then((res) => {
-            console.log(res.data);
-            document.cookie = `LoggedUser=${res.data.user}`;
+    try {
+      users.forEach(async (user) => {
+        if (user.name === login.name && user.password === login.password) {
+          const user = await axios.post(getUserRoute, login);
+          if (user.data.user) {
+            document.cookie = `LoggedUser=${user.data.user}`;
             navigate("/products");
-          })
-          .catch((e) => {
-            console.log(e);
-            alert("No Such User");
-          });
-      }
-    });
+          }
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
   };
+
   const onChange = (field, value) => {
     setLogin({ ...login, [field]: value });
   };
   useEffect(() => {
-    // axios
-    //   .get("http://localhost:4000/currentUser", { withCredentials: true })
-    //   .then((response) => {
-    //     console.log(response.data);
-    //     if (response.data === "Welcome, Gurdeep123!") {
-    //       navigate("/products");
-    //     }
-    //   });]]
-    // console.log(document.cookie);
-    // console.log(typeof document.cookie);
-    // if (document.cookie === "LoggedUser") {
-    //   console.log(document.cookie);
-    //   navigate("/products");
-    // } else {
-    //   console.log("no user cookie");
-    // }]
-
     const ck = document.cookie.split("=");
     console.log(ck[0]);
     if (ck[0] === "LoggedUser") {
@@ -52,7 +49,7 @@ function Login({ users }) {
     } else {
       console.log("no user cookie");
     }
-  }, []);
+  }, [navigate]);
   return (
     <>
       <div
@@ -105,5 +102,5 @@ function Login({ users }) {
       </div>
     </>
   );
-}
+};
 export default Login;
