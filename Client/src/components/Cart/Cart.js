@@ -1,45 +1,64 @@
-import react, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Typography, Button, Grid } from "@mui/material";
 import useStyles from "./styles";
 import CartItem from "./CartItem/CartItem";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-const Cart = ({
-  cart,
-  handleUpdateCart,
-  handleDeleteCart,
-  handleEmptyCart,
-}) => {
+import {
+  getCartRoute,
+  getUpdateCartRoute,
+  getUpdateFromCartRoute,
+  getEmptyCartRoute,
+} from "../../utils/APIRoutes";
+
+// const getCartRoute = "http://localhost:4000/cart";
+// const getUpdateCartRoute = "http://localhost:4000/cart/update";
+// const getUpdateFromCartRoute = "http://localhost:4000/cart/delete";
+// const getEmptyCartRoute = "http://localhost:4000/cart/empty";
+
+const Cart = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  //   if (!cart.length) return "Loading...";
-  useEffect(() => {
-    // axios
-    //   .get("http://localhost:4000/currentUser")
-    //   .then((response) => {
-    //     console.log(response.data);
-    //     console.log(typeof response.data);
 
-    //     if (response.data === "Welcome, Gurdeep123!") {
-    //       console.log("here");
-    //       navigate("/cart");
-    //     } else {
-    //       console.log("Go to login");
-    //       // navigate("/");
-    //     }
-    //   })
-    //   .catch((e) => {
-    //     console.log(e);
-    //   });
+  const [cart, setCart] = useState([]);
+
+  const fetchCart = async () => {
+    const cartList = await axios.get(getCartRoute);
+    setCart(cartList.data);
+  };
+
+  const handleUpdateCart = async (productId, quantity) => {
+    const itemUpdate = await axios.put(
+      `${getUpdateCartRoute}/${productId}/${quantity}`
+    );
+    setCart(itemUpdate.data);
+    fetchCart();
+  };
+
+  const handleDeleteCart = async (productId) => {
+    await axios.delete(`${getUpdateFromCartRoute}/${productId}`);
+    fetchCart();
+  };
+
+  const handleEmptyCart = async () => {
+    await axios.delete(getEmptyCartRoute);
+    fetchCart();
+  };
+
+  useEffect(() => {
     const ck = document.cookie.split("=");
-    console.log(ck[0]);
+    const fillCart = async () => {
+      await fetchCart();
+    };
+    fillCart();
     if (ck[0] === "LoggedUser") {
       navigate("/cart");
     } else {
       console.log("no user cookie");
       navigate("/");
     }
-  }, []);
+  }, [navigate]);
+
   const EmptyCart = () => {
     return (
       <Typography variant="h5">
