@@ -11,25 +11,55 @@ const { getFirebaseDB } = require("../config/Firebase");
 const Product = require("../store/Product");
 const { response, request } = require("express");
 const axios = require("axios");
+const Usermodel = require("../Model/UserSchema");
 
 let firebasedb;
 let constarr = [];
 
-const initializeFirebaseDB = () => {
-  firebasedb = getFirebaseDB();
-};
-
 const Users = async (req, res) => {
-  initializeFirebaseDB();
   try {
-    const querySnapshot = await getDocs(collection(firebasedb, "Users"));
-    let arr = [];
-    querySnapshot.forEach((user) => {
-      arr.push(user.data());
-    });
-    res.send(arr);
+    Usermodel.find({})
+      .select({ _id: 0, __v: 0 })
+      .then((response) => res.send(response))
+      .catch((err) => {
+        res.send(`Error: ${err}`);
+      });
   } catch (err) {
     console.log("Error in getting Users :-" + err);
+  }
+};
+const getcart = async (req, res) => {
+  const name = req.params.name;
+  try {
+    const user = await Usermodel.findOne({ name: name }).populate(
+      "cart.product",
+      "-_id -__v"
+    );
+
+    if (!user) {
+      res.status(404).send("User not found");
+      return;
+    }
+
+    res.send(user.cart);
+  } catch (err) {
+    console.error("Error in getcart:", err);
+    res.status(500).send(`Error: ${err}`);
+  }
+};
+const updatecart = async (req, res) => {
+  const name = req.params.name;
+  const productId = req.params.productId;
+  const quantity = req.params.quantity;
+  console.log(name, productId, quantity);
+  try {
+    const user = await Usermodel.findOne({ name: name });
+    user.quantity = quantity;
+    user.save();
+    console.log(user);
+    res.send(user);
+  } catch (err) {
+    (err) => res.send(err);
   }
 };
 const UserCookie = async (req, res) => {
@@ -62,4 +92,6 @@ module.exports = {
   UserCookie,
   currentUser,
   logout,
+  getcart,
+  updatecart,
 };

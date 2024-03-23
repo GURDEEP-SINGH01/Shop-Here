@@ -4,26 +4,33 @@ import Product from "./Product/Product";
 import makeStyles from "./styles";
 
 import axios from "axios";
-import { getAddtoCartRoute, getAllProductsRoute } from "../../utils/APIRoutes";
+import {
+  getAddtoCartRoute,
+  getAllProductsRoute,
+  getCartRoute,
+} from "../../utils/APIRoutes";
+import { RouterProvider, useNavigate } from "react-router-dom";
+import { useCart } from "../Store/context";
+import { set } from "mongoose";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
-  // const [cart, setCart] = useState([]);
-
+  const { cart, fetchCart } = useCart();
+  const [user, setUser] = useState("");
+  const navigate = useNavigate();
   const fetchProducts = async () => {
     const productList = await axios.get(getAllProductsRoute);
+    console.log(productList.data);
     setProducts(productList.data);
   };
 
-  // const fetchCart = async () => {
-  //   const cartList = await axios.get(getCartRoute);
-  //   setCart(cartList.data);
-  // };
-
   const handleAddtoCart = async (productId, quantity) => {
-    await axios.get(`${getAddtoCartRoute}/${productId}/${quantity}`);
+    // console.log(user, productId);
+    const item = await axios.get(
+      `${getAddtoCartRoute}/${productId}/${quantity}/${user}`
+    );
     // setCart(item.data);
-    // fetchCart();
+    fetchCart();
   };
 
   useEffect(() => {
@@ -31,7 +38,19 @@ const Products = () => {
       await fetchProducts();
     };
     fetchingProducts();
+    const ck = document.cookie.split("=");
+    // console.log(ck[1]);
+    if (ck[0] === "LoggedUser") {
+      navigate("/products");
+    } else {
+      console.log("no user cookie");
+      navigate("/");
+    }
+    setUser(ck[1]);
   }, []);
+  useEffect(() => {
+    fetchCart();
+  }, [cart.length]);
 
   const classes = makeStyles();
   return (

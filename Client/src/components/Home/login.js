@@ -9,12 +9,15 @@ const Login = () => {
 
   const getAllUsers = async () => {
     const users = await axios.get(getAllUsersRoute);
+    console.log(users.data);
     setUsers(users.data);
   };
 
   useEffect(() => {
     const helper = async () => {
-      await getAllUsers();
+      await getAllUsers()
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
     };
     helper();
   }, []);
@@ -48,7 +51,8 @@ const Login = () => {
       navigate("/products");
     } else {
       console.log("no user cookie");
-    }
+      navigate("/");
+    } 
   }, [navigate]);
   return (
     <>

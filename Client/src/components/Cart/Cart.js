@@ -9,7 +9,9 @@ import {
   getUpdateCartRoute,
   getUpdateFromCartRoute,
   getEmptyCartRoute,
+  getcart,
 } from "../../utils/APIRoutes";
+import { CssTwoTone } from "@mui/icons-material";
 
 // const getCartRoute = "http://localhost:4000/cart";
 // const getUpdateCartRoute = "http://localhost:4000/cart/update";
@@ -19,18 +21,29 @@ import {
 const Cart = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-
   const [cart, setCart] = useState([]);
+  const [user, setUser] = useState("");
+
+  const setCurrUser = async () => {
+    const ck = document.cookie.split("=");
+    const curruser = ck[1];
+    return curruser;
+  };
 
   const fetchCart = async () => {
-    const cartList = await axios.get(getCartRoute);
+    const user = await setCurrUser();
+    const cartList = await axios.get(`${getcart}/${user}`);
+    // console.log(cartList.data);
     setCart(cartList.data);
   };
 
   const handleUpdateCart = async (productId, quantity) => {
+    const user = await setCurrUser();
+    console.log(productId,user,quantity);
     const itemUpdate = await axios.put(
-      `${getUpdateCartRoute}/${productId}/${quantity}`
+      `${getUpdateCartRoute}/${user}/${productId}/${quantity}`
     );
+    console.log(itemUpdate, typeof itemUpdate);
     setCart(itemUpdate.data);
     fetchCart();
   };
@@ -44,21 +57,27 @@ const Cart = () => {
     await axios.delete(getEmptyCartRoute);
     fetchCart();
   };
-
   useEffect(() => {
-    const ck = document.cookie.split("=");
+    const helper = async () => {
+      try {
+        const ck = document.cookie.split("=");
+        if (ck[0] === "LoggedUser") {
+          navigate("/cart");
+        } else {
+          console.log("no user cookie");
+          navigate("/");
+        }
+        setUser(ck[1]);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    helper();
     const fillCart = async () => {
       await fetchCart();
     };
     fillCart();
-    if (ck[0] === "LoggedUser") {
-      navigate("/cart");
-    } else {
-      console.log("no user cookie");
-      navigate("/");
-    }
-  }, [navigate]);
-
+  }, [cart.length]);
   const EmptyCart = () => {
     return (
       <Typography variant="h5">
@@ -70,15 +89,15 @@ const Cart = () => {
     );
   };
   const FilledCart = () => {
+    console.log(cart);
     let subtotal = cart.reduce((a, b) => {
-      return a + b.quantity * b.price;
+      return a + b.quantity * b.product.price;
     }, 0);
-
     return (
       <div>
         <Grid container spacing={3}>
           {cart.map((item) => (
-            <Grid item xs={12} sm={4} key={item.id}>
+            <Grid item xs={12} sm={4} key={item.product.id}>
               <CartItem
                 item={item}
                 onUpdateCart={handleUpdateCart}

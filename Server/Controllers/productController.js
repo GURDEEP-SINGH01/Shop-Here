@@ -8,32 +8,38 @@ const {
 } = require("firebase/firestore");
 const { getFirebaseDB } = require("../config/Firebase");
 const Product = require("../store/Product");
+const Productsmodel = require("../Model/ProductsSchema");
+const Usermodel = require("../Model/UserSchema");
 
 let firebasedb;
 let constarr = [];
 
-const initializeFirebaseDB = () => {
-  firebasedb = getFirebaseDB();
-};
+// const initializeFirebaseDB = () => {
+//   firebasedb = getFirebaseDB();
+// };
 
 const allproducts = async (req, res) => {
-  initializeFirebaseDB();
-
+  Productsmodel.find()
+    .select({ _id: 0, __v: 0 })
+    .then((response) => res.send(response))
+    .catch((err) => res.send("Error: ", err));
+};
+const setallproducts = async (req, res) => {
   try {
-    const collectionRef = collection(firebasedb, "AllProducts");
-    let dataUpload = await getDocs(collectionRef);
-    let arr = [];
-
-    dataUpload.forEach((doc) => {
-      arr.push(doc.data());
+    const data = req.body;
+    const product = new Productsmodel({
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      price: data.price,
+      image: data.image,
     });
-    constarr = [...arr];
-    res.send(arr);
+    product.save();
+    res.send("Product added");
   } catch (err) {
-    console.log("Error in getdata :-" + err);
+    res.send("Error: " + err);
   }
 };
-
 const addproducts = async (req, res) => {
   initializeFirebaseDB();
 
@@ -50,36 +56,35 @@ const addproducts = async (req, res) => {
 };
 
 const addtoCart = async (req, res) => {
-  initializeFirebaseDB();
-  const id = req.params.id;
-  const quantity = req.params.quantity;
   try {
-    let response;
-    const collectionRef = doc(firebasedb, "CartItems", `${id}`);
-    for (const item of constarr) {
-      if (item.id == id) {
-        item.quantity = Number(quantity);
-        response = await setDoc(collectionRef, item);
-      }
-    }
+    const id = req.params.id;
+    const quantity = req.params.quantity;
+    const username = req.params.name;
+    console.log("Hello");
+    const product = await Productsmodel.findOne({ id: id });
+    const user = await Usermodel.findOne({ name: username });
+    console.log("Product", product);
+    console.log("USER", user);
+    // product.quantity(quantity);
+    user.cart.push({
+      product: product,
+      quantity: user.cart.quantity ? user.cart.quantity + 1 : 1,
+    });
+    await user.save();
     console.log("Item added to cart");
-    res.send(response);
+    res.send(user);
   } catch (err) {
     console.log("Error occured while adding to cart :-" + err);
   }
 };
 const getfromCart = async (req, res) => {
-  initializeFirebaseDB();
   try {
-    const collectionRef = collection(firebasedb, "CartItems");
-    let dataUpload = await getDocs(collectionRef);
-    let arr = [];
-
-    dataUpload.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
-      arr.push(doc.data());
-    });
-    res.send(arr);
+    const username = req.params.name;
+    console.log(username);
+    const user = await Usermodel.findOne({ name: username });
+    console.log("getFromcart", user);
+    console.log(user.cart);
+    res.send(user.cart);
   } catch (err) {
     console.log("Error occured while getting items from cart :- ", err);
   }
@@ -143,4 +148,5 @@ module.exports = {
   updatefromCart,
   deletefromCart,
   emptyCart,
+  setallproducts,
 };

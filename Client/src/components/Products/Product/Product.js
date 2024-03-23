@@ -12,10 +12,12 @@ import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import makeStyles from "./styles";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../../Store/context";
 
 const Product = ({ product, onAddToCart }) => {
   const classes = makeStyles();
   const navigate = useNavigate();
+  const { cart, fetchCart } = useCart();
   useEffect(() => {
     // axios
     //   .get("http://localhost:4000/currentUser")
@@ -65,6 +67,7 @@ const Product = ({ product, onAddToCart }) => {
           aria-label="Add to Cart"
           onClick={() => {
             onAddToCart(product.id, 1);
+            fetchCart();
           }}
         >
           <AddShoppingCart />
